@@ -1,0 +1,41 @@
+{
+  "name": "hubot-hubot-perforce",
+  "description": "Hubot script fo",
+  "version": "0.1.0",
+  "homepage": "https://github.com/mdouglass/hubot-sns",
+  "author": "Matthew Douglass <matthew+npm@douglasstribe.com>",
+  "license": "MIT",
+
+  "keywords": [
+    "hubot",
+    "hubot-scripts",
+    "perforce",
+    "p4"
+  ],
+
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mdouglass/hubot-perforce.git"
+  },
+
+  "bugs": {
+    "url": "https://github.com/mdouglass/hubot-perforce/issues"
+  },
+
+  "dependencies": {
+    "coffee-script": "~1.6"
+  },
+
+  "devDependencies": {
+    "mocha": "*",
+    "chai": "*",
+    "sinon-chai": "*",
+    "sinon": "*"
+  },
+
+  "main": "index.coffee",
+
+  "scripts": {
+    "test": "script/test"
+  }
+}
