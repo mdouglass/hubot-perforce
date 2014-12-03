@@ -1,6 +1,6 @@
 {
   "name": "hubot-hubot-perforce",
-  "description": "Hubot script fo",
+  "description": "Hubot script for interacting with Perforce",
   "version": "0.1.0",
   "homepage": "https://github.com/mdouglass/hubot-sns",
   "author": "Matthew Douglass <matthew+npm@douglasstribe.com>",

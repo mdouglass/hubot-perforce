@@ -3,6 +3,8 @@
 
 Hubot script for interacting with Perforce
 
+**THIS PROJECT IS NOT YET IN A USABLE STATE**
+
 ## Installation
 
 In hubot project repo, run:

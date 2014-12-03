@@ -14,6 +14,9 @@
 # Author:
 #   Matthew Douglass[@<org>]
 
+P4 = require './perforce/p4'
+{ inspect } = require 'util'
+
 module.exports = (robot) ->
   robot.respond /hello/, (msg) ->
     msg.reply "hello!"
