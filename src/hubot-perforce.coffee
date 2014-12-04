@@ -21,5 +21,6 @@ module.exports = (robot) ->
   robot.respond /hello/, (msg) ->
     msg.reply "hello!"
 
-  robot.router.post '/hubot/perforce', (req, res) ->
-    return
+  # robot.router.post '/hubot/perforce', (req, res) ->
+  #   return
+  
