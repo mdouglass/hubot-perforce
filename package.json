@@ -1,7 +1,7 @@
 {
   "name": "hubot-perforce",
   "description": "Hubot script for interacting with Perforce",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "homepage": "https://github.com/mdouglass/hubot-perforce",
   "author": "Matthew Douglass <matthew+npm@douglasstribe.com>",
   "license": "MIT",

@@ -35,11 +35,11 @@ module.exports = (robot) ->
   robot.router.post '/hubot/perforce', (req, res) ->
     res.end()
 
-    robot.p4.describe null, req.body.change, (error, change) ->
+    robot.p4.describe null, req.body.change, (error, output) ->
       if error?
-        robot.emit 'perforce:error', error
+        robot.emit 'perforce:error', output or error
       else
-        robot.emit 'perforce:change', change
+        robot.emit 'perforce:change', output
 
   # robot.on 'perforce:change', (change) ->
   #   robot.logger.warning "Perforce Change: #{inspect change}"
