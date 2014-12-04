@@ -41,8 +41,8 @@ module.exports = (robot) ->
       else
         robot.emit 'perforce:change', change
 
-  robot.on 'perforce:change', (change) ->
-    robot.logger.warning "Perforce Change: #{inspect change}"
+  # robot.on 'perforce:change', (change) ->
+  #   robot.logger.warning "Perforce Change: #{inspect change}"
 
   p4 = new P4()
   p4.charset  = Options.charset
