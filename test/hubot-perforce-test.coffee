@@ -10,12 +10,20 @@ describe 'hubot-perforce', ->
   beforeEach ->
     @robot =
       respond: sinon.spy()
-      hear: sinon.spy()
+      emit: sinon.spy()
+      router:
+        post: sinon.spy()
 
     require('../src/hubot-perforce')(@robot)
 
-  it 'registers a respond listener', ->
-    expect(@robot.respond).to.have.been.calledWith(/hello/)
+  it 'registers a route', ->
+    expect(@robot.router.post).to.have.been.calledWith('/hubot/perforce')
+
+  it 'emits a ready event', ->
+    expect(@robot.emit).to.have.been.calledWith('perforce:ready')
+
+  it 'created a default p4 object', ->
+    expect(@robot.p4).is.instanceof(P4)
 
   # it 'p4 info', (done) ->
   #   p4 = new P4

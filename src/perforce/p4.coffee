@@ -18,11 +18,12 @@ class P4
     # response conversion behaviors
     @responseInfersType = true
     @responseSingleElementArrayToObject = true
+    @responseOrganized = true
     
   exec: (args, callback) ->
     options = 
       # 'cwd': '',
-      # 'env': '',
+      'env': process.env,
       'encoding': 'binary',
       'timeout': 0,
       'maxBuffer': @maxBuffer,
@@ -56,6 +57,26 @@ class P4
       if response.length == 1
         response = response[0]
 
+    if @responseOrganized
+      loop
+        i = i + 1 or 0
+        break if ('depotFile'+i) not of response
+        file =
+          depotFile: response['depotFile' + i]
+          action:    response['action'    + i]
+          type:      response['type'      + i]
+          rev:       response['rev'       + i]
+          fileSize:  response['fileSize'  + i]
+          digest:    response['digest'    + i]
+        delete response['depotFile' + i]
+        delete response['action'    + i]
+        delete response['type'      + i]
+        delete response['rev'       + i]
+        delete response['fileSize'  + i]
+        delete response['digest'    + i]
+        response.files = response.files or []
+        response.files.push file
+
     response
 
   inferTypes: (object) ->
@@ -88,7 +109,11 @@ class P4
     @command null, 'streams', args, callback
 
   istat: (args, stream, callback) ->
-    commandArgs = args.concat [ stream ]
+    commandArgs = (args ? []).concat [ stream ]
     @command null, 'istat', commandArgs, callback
+
+  describe: (args, change, callback) ->
+    commandArgs = (args ? []).concat [ change ]
+    @command null, 'describe', commandArgs, callback
 
 module.exports = P4

@@ -2,11 +2,17 @@
 #   Hubot script for interacting with Perforce
 #
 # Configuration:
-#   LIST_OF_ENV_VARS_TO_SET
+#   HUBOT_P4CHARSET
+#	  HUBOT_P4CLIENT
+#	  HUBOT_P4HOST
+#	  HUBOT_P4LANGUAGE
+#	  HUBOT_P4PORT
+#	  HUBOT_P4USER
 #
 # Commands:
-#   hubot hello - <what the respond trigger does>
-#   orly - <what the hear trigger does>
+#
+# URLs:
+#   /hubot/perforce
 #
 # Notes:
 #   <optional notes required for the script>
@@ -17,10 +23,35 @@
 P4 = require './perforce/p4'
 { inspect } = require 'util'
 
-module.exports = (robot) ->
-  robot.respond /hello/, (msg) ->
-    msg.reply "hello!"
+Options =
+  charset:  process.env.HUBOT_P4CHARSET  or null
+  client:   process.env.HUBOT_P4CLIENT   or null
+  host:     process.env.HUBOT_P4HOST     or null
+  language: process.env.HUBOT_P4LANGUAGE or null
+  port:     process.env.HUBOT_P4PORT     or null
+  user:     process.env.HUBOT_P4USER     or null
 
-  # robot.router.post '/hubot/perforce', (req, res) ->
-  #   return
-  
+module.exports = (robot) ->
+  robot.router.post '/hubot/perforce', (req, res) ->
+    res.end()
+
+    robot.p4.describe null, req.body.change, (error, change) ->
+      if error?
+        robot.emit 'perforce:error', error
+      else
+        robot.emit 'perforce:change', change
+
+  robot.on 'perforce:change', (change) ->
+    robot.logger.warning "Perforce Change: #{inspect change}"
+
+  p4 = new P4()
+  p4.charset  = Options.charset
+  p4.client   = Options.client
+  p4.host     = Options.host
+  p4.language = Options.language
+  p4.port     = Options.port
+  p4.user     = Options.user
+
+  robot.emit 'perforce:ready', p4
+
+  robot.p4 = p4
