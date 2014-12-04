@@ -17,42 +17,51 @@ describe 'hubot-perforce', ->
   it 'registers a respond listener', ->
     expect(@robot.respond).to.have.been.calledWith(/hello/)
 
-  it 'p4 info', (done) ->
-    p4 = new P4
-    p4.execute [ '-G', 'info' ], (error, stdout, stderr) ->
-      console.log "error:  #{inspect error}"
-      console.log typeof stdout
-      console.log "stdout: #{inspect stdout}"
-      console.log typeof stderr
-      console.log "stderr: #{inspect stderr}"
-      done()
-
-  # it 'p4 error', (done) ->
+  # it 'p4 info', (done) ->
   #   p4 = new P4
-  #   p4.execute [ '-G', 'error' ], (error, stdout, stderr) ->
+  #   p4.info (error, result) ->
   #     console.log "error:  #{inspect error}"
-  #     console.log typeof stdout
-  #     console.log "stdout: #{inspect stdout}"
-  #     console.log typeof stderr
-  #     console.log "stderr: #{inspect stderr}"
+  #     console.log "result: #{inspect result}"
   #     done()
 
-  it 'p4 streams', (done) ->
-    p4 = new P4
-    p4.execute [ '-G', 'streams' ], (error, stdout, stderr) ->
-      console.log "error:  #{inspect error}"
-      console.log typeof stdout
-      console.log "stdout: #{inspect stdout}"
-      console.log typeof stderr
-      console.log "stderr: #{inspect stderr}"
-      done()
+  # it 'p4 unknown', (done) ->
+  #   p4 = new P4
+  #   p4.exec [ 'this_does_not_exist' ], (error, result) ->
+  #     console.log "error:  #{inspect error}"
+  #     console.log "result: #{inspect result}"
+  #     done()
 
-  it 'p4 describe', (done) ->
-    p4 = new P4
-    p4.execute [ '-G', 'describe', '30000' ], (error, stdout, stderr) ->
-      console.log "error:  #{inspect error}"
-      console.log typeof stdout
-      console.log "stdout: #{inspect stdout}"
-      console.log typeof stderr
-      console.log "stderr: #{inspect stderr}"
-      done()
+  # it 'p4 streams', (done) ->
+  #   p4 = new P4
+  #   p4.exec [ 'streams' ], (error, result) ->
+  #     console.log "error:  #{inspect error}"
+  #     console.log "result: #{inspect result}"
+  #     done()
+
+  # it 'p4 describe', (done) ->
+  #   p4 = new P4
+  #   p4.port = "ssl:perforce01.sjc.kixeye.com:2667"
+  #   p4.charset = "utf8"
+  #   p4.exec [ 'describe', '30000' ], (error, result) ->
+  #     console.log "error:  #{inspect error}"
+  #     console.log "result: #{inspect result}"
+  #     done()
+
+  # it 'p4 integration test', (done) ->
+  #   p4 = new P4
+  #   p4.port = "ssl:perforce01.sjc.kixeye.com:2667"
+  #   p4.charset = "utf8"
+
+  #   p4.streams [ "-F", "Type=development | Type=task", "//wcra/..." ], (error, streams) ->
+  #     expect(error).is.null()
+  #     expect(streams).is.not.null()
+  #     for stream in streams
+  #       do (stream) ->
+  #         p4.istat [ "-a", "-f" ], stream.Stream, (error, status) ->
+  #           expect(error).is.null()
+  #           expect(status).is.not.null()
+
+  #           # console.log "#{stream.Name} #{stream.Stream} #{stream.Parent}"
+  #           if status.integFromParent
+              
+  #             console.log "Tell #{stream.Owner} WARNING: Pending integration from parent"

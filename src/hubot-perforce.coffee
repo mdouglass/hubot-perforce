@@ -20,3 +20,6 @@ P4 = require './perforce/p4'
 module.exports = (robot) ->
   robot.respond /hello/, (msg) ->
     msg.reply "hello!"
+
+  robot.router.post '/hubot/perforce', (req, res) ->
+    return

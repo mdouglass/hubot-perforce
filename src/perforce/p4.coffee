@@ -1,108 +1,94 @@
-# function execP4(p4cmd, options, callback) {
-#   if (typeof options === 'function') {
-#     callback = options;
-#     options = undefined;
-#   }
-
-#   var ob = optionBuilder(options);
-#   var cmd = ['p4', p4cmd, ob.args.join(' '), ob.files.join(' ')];
-#   var child = exec(cmd.join(' '), function (err, stdout, stderr) {
-#     if (err) return callback(err);
-#     if (stderr) return callback(new Error(stderr));
-#     return callback(null, stdout);
-#   });
-#   if (ob.stdin.length > 0) {
-#     ob.stdin.forEach(function (line) {
-#       child.stdin.write(line + '\n');
-#     });
-#     child.stdin.emit('end');
-#   }
-# }
-
 { execFile } = require 'child_process'
 { inspect } = require 'util'
-
-class PythonNull
-
-class ConsumingBuffer
-  constructor: (buffer) ->
-    @buffer = buffer
-    @offset = 0
-
-  hasMore: () ->
-    @offset < @buffer.length
-
-  readUInt8: () ->
-    result = @buffer.readUInt8 @offset
-    @offset += 1
-    result
-
-  readInt32LE: () ->
-    result = @buffer.readInt32LE @offset
-    @offset += 4
-    result
-
-  readString: (encoding, length) ->
-    result = @buffer.toString encoding, @offset, @offset + length
-    @offset += length
-    result
-
-  toString: () ->
-    return "[ConsumingBuffer: at #{@offset}]"
+{ unmarshal, unmarshalAll } = require '../python/unmarshaller'
 
 class P4
   constructor: () ->
-    return
+    # p4 command line options
+    @charset = null
+    @client = null
+    @host = null
+    @language = null
+    @port = null
+    @user = null
 
-  execute: (args, callback) ->
+    # p4 exec options
+    @maxBuffer = 200*1024
+
+    # response conversion behaviors
+    @responseInfersType = true
+    @responseSingleElementArrayToObject = true
+    
+  exec: (args, callback) ->
     options = 
       # 'cwd': '',
       # 'env': '',
       'encoding': 'binary',
       'timeout': 0,
-      'maxBuffer': 200*1024,  # MSED - Correct this, 200KB limit is too low
+      'maxBuffer': @maxBuffer,
       'killSignal': 'SIGTERM'
 
+    allArgs = []
+    allArgs.push "-C", @charset if @charset
+    allArgs.push "-c", @client if @client
+    allArgs.push "-H", @host if @host
+    allArgs.push "-L", @language if @language
+    allArgs.push "-p", @port if @port
+    allArgs.push "-u", @user if @user
+    allArgs.push "-G"
+    allArgs.push args...
+    # console.log allArgs
+
     # MSED - Maybe convert to spawn for more flexibility
-    execFile 'p4', args, options, (error, stdout, stderr) =>
-      callback error, @unmarshal stdout, @unmarshal stderr
-
-  unmarshal: (contents) ->
-    try
-      buffer = new ConsumingBuffer(new Buffer(contents, 'binary'))
-      while buffer.hasMore()
-        @unmarshalObject buffer
-    catch error
-      error
-
-  unmarshalObject: (buffer) ->
-    type = String.fromCharCode buffer.readUInt8()
-
-    switch type
-      when '0'
-        new PythonNull
-      when 's'
-        @unmarshalString buffer
-      when 'i'
-        buffer.readInt32LE()
-      when '{'
-        @unmarshalDict buffer
+    execFile 'p4', allArgs, options, (error, stdout, stderr) =>
+      if stderr and not error
+        callback new Error('Unknown error on stderr'), @processResponse unmarshal stderr
       else
-        throw new Error("Unknown object type in #{buffer}: '#{type}'")
+        callback error, @processResponse unmarshalAll stdout 
 
-  unmarshalDict: (buffer) ->
-    dict = { }
-    while true
-      key = @unmarshalObject buffer
-      if key instanceof PythonNull
-        break
-      value = @unmarshalObject buffer
-      dict[key] = value
-    dict
+  processResponse: (response) ->
+    return response if not response
 
-  unmarshalString: (buffer) ->
-    size = buffer.readInt32LE()
-    string = buffer.readString 'utf8', size
-    string
+    if @responseInfersType
+      response = @inferTypes response
+
+    if @responseSingleElementArrayToObject
+      if response.length == 1
+        response = response[0]
+
+    response
+
+  inferTypes: (object) ->
+    switch typeof object
+      when 'Array'
+        for value in object
+          @inferTypes value
+      when 'string'
+        switch 
+          when object == 'false' then false
+          when object == 'true' then true
+          when isFinite(object) then parseInt(object, 10) 
+          else object
+      else
+        for own key, value of object
+          object[key] = @inferTypes value
+        object
+
+  command: (options, command, commandArgs, callback) ->
+    args = []
+    args.push options... if options?
+    args.push command
+    args.push commandArgs... if commandArgs?
+    @exec args, callback
+
+  info: (callback) ->
+    @command null, 'info', null, callback
+
+  streams: (args, callback) ->
+    @command null, 'streams', args, callback
+
+  istat: (args, stream, callback) ->
+    commandArgs = args.concat [ stream ]
+    @command null, 'istat', commandArgs, callback
 
 module.exports = P4
