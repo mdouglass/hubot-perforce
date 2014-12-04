@@ -3,11 +3,11 @@
 #
 # Configuration:
 #   HUBOT_P4CHARSET
-#	  HUBOT_P4CLIENT
-#	  HUBOT_P4HOST
-#	  HUBOT_P4LANGUAGE
-#	  HUBOT_P4PORT
-#	  HUBOT_P4USER
+#   HUBOT_P4CLIENT
+#   HUBOT_P4HOST
+#   HUBOT_P4LANGUAGE
+#   HUBOT_P4PORT
+#   HUBOT_P4USER
 #
 # Commands:
 #
@@ -35,7 +35,9 @@ module.exports = (robot) ->
   robot.router.post '/hubot/perforce', (req, res) ->
     res.end()
 
+    robot.logger.debug "Received perforce change notification: #{inspect req.body}"
     robot.p4.describe null, req.body.change, (error, output) ->
+      robot.logger.debug "p4 describe\n\terror: #{inspect error}\n\tresults: #{inspect output}"
       if error?
         robot.emit 'perforce:error', output or error
       else

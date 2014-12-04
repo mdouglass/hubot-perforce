@@ -11,6 +11,7 @@ class P4
     @language = null
     @port = null
     @user = null
+    @executable = null
 
     # p4 exec options
     @maxBuffer = 200*1024
@@ -19,6 +20,9 @@ class P4
     @responseInfersType = true
     @responseSingleElementArrayToObject = true
     @responseOrganized = true
+
+    # logging
+    @logger = null
     
   exec: (args, callback) ->
     options = 
@@ -41,7 +45,8 @@ class P4
     # console.log allArgs
 
     # MSED - Maybe convert to spawn for more flexibility
-    execFile 'p4', allArgs, options, (error, stdout, stderr) =>
+    @logger?.debug "exec: p4 #{allArgs.join(' ')}"
+    execFile @executable or 'p4', allArgs, options, (error, stdout, stderr) =>
       if stderr and not error
         callback new Error('Unknown error on stderr'), @processResponse unmarshal stderr
       else

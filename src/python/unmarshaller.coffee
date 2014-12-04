@@ -60,6 +60,7 @@ unmarshalString = (buffer) ->
   string
 
 exports.unmarshal = (contents) ->
+  return null if contents.length == 0
   try
     buffer = new ConsumingBuffer(new Buffer(contents, 'binary'))
     unmarshalNext buffer
@@ -67,6 +68,7 @@ exports.unmarshal = (contents) ->
     error
 
 exports.unmarshalAll = (contents) ->
+  return null if contents.length == 0
   try
     buffer = new ConsumingBuffer(new Buffer(contents, 'binary'))
     while buffer.hasMore()
