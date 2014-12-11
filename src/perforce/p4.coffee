@@ -14,7 +14,8 @@ class P4
     @executable = null
 
     # p4 exec options
-    @maxBuffer = 200*1024
+    @maxBuffer = 1024*1024
+    @timeout = 0
 
     # response conversion behaviors
     @responseInfersType = true
@@ -23,13 +24,13 @@ class P4
 
     # logging
     @logger = null
-    
+
   exec: (args, callback) ->
-    options = 
+    options =
       # 'cwd': '',
       'env': process.env,
       'encoding': 'binary',
-      'timeout': 0,
+      'timeout': @timeout,
       'maxBuffer': @maxBuffer,
       'killSignal': 'SIGTERM'
 
@@ -50,7 +51,7 @@ class P4
       if stderr and not error
         callback new Error('Unknown error on stderr'), @processResponse unmarshal stderr
       else
-        callback error, @processResponse unmarshalAll stdout 
+        callback error, @processResponse unmarshalAll stdout
 
   processResponse: (response) ->
     return response if not response
@@ -90,10 +91,10 @@ class P4
         for value in object
           @inferTypes value
       when 'string'
-        switch 
+        switch
           when object == 'false' then false
           when object == 'true' then true
-          when isFinite(object) then parseInt(object, 10) 
+          when isFinite(object) then parseInt(object, 10)
           else object
       else
         for own key, value of object
